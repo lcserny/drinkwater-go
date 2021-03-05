@@ -8,12 +8,15 @@ import (
 	"time"
 )
 
-type Startable interface {
-	start()
-}
+const (
+	title   = "Drink Water Notification"
+	message = "An hour has passed, you need to drink some water!"
+)
 
-type Stoppable interface {
-	stop()
+type pauseable interface {
+	start()
+	pause()
+	unpause()
 }
 
 func newNotifier(t time.Duration, f func()) *notifier {
@@ -24,35 +27,31 @@ func newNotifier(t time.Duration, f func()) *notifier {
 }
 
 type notifier struct {
-	runFunc     func()
-	tickerTime  time.Duration
-	ticker      *time.Ticker
-	closeTicker chan bool
+	runFunc    func()
+	tickerTime time.Duration
+	ticker     *time.Ticker
 }
 
 func (n *notifier) start() {
 	log.Info("Starting execution")
-
-	n.closeTicker = make(chan bool)
 	n.ticker = time.NewTicker(n.tickerTime)
-	go func() {
-		for {
-			select {
-			case <-n.closeTicker:
-				return
-			case <-n.ticker.C:
-				n.runFunc()
-			}
-		}
-	}()
+	for {
+		<-n.ticker.C
+		n.runFunc()
+	}
 }
 
-func (n *notifier) stop() {
-	log.Info("Stopping execution")
-
+func (n *notifier) pause() {
+	log.Info("Pausing execution")
 	if n.ticker != nil {
 		n.ticker.Stop()
-		n.closeTicker <- true
+	}
+}
+
+func (n *notifier) unpause() {
+	log.Info("Unpausing execution")
+	if n.ticker != nil {
+		n.ticker.Reset(n.tickerTime)
 	}
 }
 
@@ -81,18 +80,16 @@ func handlePause(item *systray.MenuItem, n *notifier) {
 		<-item.ClickedCh
 		if item.Checked() {
 			item.Uncheck()
-			n.start()
+			n.unpause()
 		} else {
 			item.Check()
-			n.stop()
+			n.pause()
 		}
 	}
 }
 
 func triggerNotification() {
-	err := beeep.Notify("Drink Water Notification",
-		"An hour has passed, you need to drink some water!", "")
-	if err != nil {
+	if err := beeep.Notify(title, message, ""); err != nil {
 		log.Error(err)
 	}
 }
