@@ -1,69 +1,21 @@
 package main
 
 import (
-	"fmt"
-	"github.com/gen2brain/beeep"
+	"drinkwater-go/notify"
 	"github.com/getlantern/systray"
-	"github.com/getlantern/systray/example/icon"
+	log "github.com/sirupsen/logrus"
+	"os"
 )
 
 func main() {
-	systray.Run(onReady, onExit)
+	initLogging()
+	systray.Run(func() { notify.OnReady() }, func() { notify.OnExit() })
 }
 
-func onReady() {
-	systray.SetIcon(icon.Data)
-	systray.SetTitle("Drink Water!")
-	systray.SetTooltip("Drink more water notification app")
-
-	pauseItem := systray.AddMenuItemCheckbox("Pause", "Pause execution", false)
-	go handlePause(pauseItem)
-
-	// TODO: remove once scheduled job is ok
-	notifyItem := systray.AddMenuItem("Notify", "Show popup notification")
-	go handleNotify(notifyItem)
-
-	exitItem := systray.AddMenuItem("Exit", "Exit the whole app")
-	go handleExit(exitItem)
-
-	// TODO: add scheduled job with auto-trigger notify, use channel for outside pause command
-}
-
-func onExit() {
-	fmt.Println("Exiting")
-}
-
-// TODO: stop scheduled job, use channels
-func handlePause(item *systray.MenuItem) {
-	for {
-		<-item.ClickedCh
-		if item.Checked() {
-			item.Uncheck()
-		} else {
-			item.Check()
-		}
-		fmt.Println("Clicked pause, value to:", item.Checked())
-	}
-}
-
-func handleNotify(item *systray.MenuItem) {
-	for {
-		<-item.ClickedCh
-		triggerNotification()
-		fmt.Println("Clicked notify")
-	}
-}
-
-// TODO: add image in code and use go embed
-func triggerNotification() {
-	err := beeep.Notify("Title", "Message body", "assets/information.png")
+func initLogging() {
+	file, err := os.OpenFile("drinkwater.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
 	if err != nil {
-		// TODO: implement logging
-		panic(err)
+		log.Fatal(err)
 	}
-}
-
-func handleExit(item *systray.MenuItem) {
-	<-item.ClickedCh
-	systray.Quit()
+	log.SetOutput(file)
 }
