@@ -14,6 +14,8 @@ const (
 )
 
 func OnReady() {
+	triggerNotification()
+
 	systray.SetIcon(icon.Data)
 	systray.SetTitle("Drink Water!")
 	systray.SetTooltip("Drink more water notification app")
@@ -47,6 +49,7 @@ func handlePause(item *systray.MenuItem, n *notifier) {
 }
 
 func triggerNotification() {
+	log.Info("Triggered notification")
 	if err := beeep.Notify(title, message, ""); err != nil {
 		log.Error(err)
 	}
