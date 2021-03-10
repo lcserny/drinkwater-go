@@ -1,9 +1,9 @@
 package notify
 
 import (
-	"github.com/gen2brain/beeep"
 	"github.com/getlantern/systray"
 	"github.com/getlantern/systray/example/icon"
+	"github.com/go-toast/toast"
 	log "github.com/sirupsen/logrus"
 	"time"
 )
@@ -50,7 +50,8 @@ func handlePause(item *systray.MenuItem, n *notifier) {
 
 func triggerNotification() {
 	log.Info("Triggered notification")
-	if err := beeep.Notify(title, message, ""); err != nil {
+	notification := toast.Notification{Title: title, Message: message}
+	if err := notification.Push(); err != nil {
 		log.Error(err)
 	}
 }
