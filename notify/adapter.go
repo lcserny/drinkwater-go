@@ -9,6 +9,7 @@ import (
 )
 
 const (
+	appId   = "DrinkwaterGo" // when changing this please also update the build script
 	title   = "Drink Water Notification"
 	message = "An hour has passed, you need to drink some water!"
 )
@@ -50,7 +51,7 @@ func handlePause(item *systray.MenuItem, n *notifier) {
 
 func triggerNotification() {
 	log.Info("Triggered notification")
-	notification := toast.Notification{Title: title, Message: message}
+	notification := toast.Notification{AppID: appId, Title: title, Message: message}
 	if err := notification.Push(); err != nil {
 		log.Error(err)
 	}
