@@ -7,15 +7,17 @@ import (
 	"os"
 )
 
+const logFile = "drinkwater.log"
+
 func main() {
 	f := initLogging()
 	defer f.Close()
 
-	systray.Run(func() { notify.OnReady() }, func() { notify.OnExit() })
+	systray.Run(notify.OnReady, notify.OnExit)
 }
 
 func initLogging() *os.File {
-	file, err := os.OpenFile("drinkwater.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+	file, err := os.OpenFile(logFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
 	if err != nil {
 		log.Fatal(err)
 	}
