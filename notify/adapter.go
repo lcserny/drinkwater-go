@@ -40,7 +40,7 @@ func handlePause(item *systray.MenuItem, n *notifier) {
 		<-item.ClickedCh
 		if item.Checked() {
 			item.Uncheck()
-			n.unpause()
+			n.resume()
 		} else {
 			item.Check()
 			n.pause()

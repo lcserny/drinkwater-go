@@ -34,8 +34,8 @@ func (n *notifier) pause() {
 	}
 }
 
-func (n *notifier) unpause() {
-	log.Info("Unpausing execution")
+func (n *notifier) resume() {
+	log.Info("Resuming execution")
 	if n.ticker != nil {
 		n.ticker.Reset(n.tickerTime)
 	}
