@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+// TODO refactor this, make it more testable
+
 func newNotifier(t time.Duration, f func()) *notifier {
 	return &notifier{
 		runFunc:    f,
