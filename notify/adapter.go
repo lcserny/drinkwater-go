@@ -9,6 +9,8 @@ import (
 )
 
 const (
+	notificationDelay = 1 * time.Hour
+
 	appId   = "DrinkwaterGo" // when changing this please also update the build script
 	title   = "Drink Water Notification"
 	message = "An hour has passed, you need to drink some water!"
@@ -21,32 +23,33 @@ func OnReady() {
 	systray.SetTitle("Drink Water!")
 	systray.SetTooltip("Drink more water notification app")
 
-	n := newNotifier(1*time.Hour, triggerNotification)
-
+	n := newNotifier(notificationDelay, triggerNotification)
 	pauseItem := systray.AddMenuItemCheckbox("Pause", "Pause execution", false)
-	go handlePause(pauseItem, n)
-
 	exitItem := systray.AddMenuItem("Exit", "Close the system tray app")
-	go handleExit(exitItem)
+	go n.start()
 
-	n.start()
+	listenForCommands(n, pauseItem, exitItem)
+}
+
+func listenForCommands(n *notifier, pauseItem *systray.MenuItem, exitItem *systray.MenuItem) {
+	for {
+		select {
+		case <-pauseItem.ClickedCh:
+			if pauseItem.Checked() {
+				pauseItem.Uncheck()
+				n.resume()
+			} else {
+				pauseItem.Check()
+				n.pause()
+			}
+		case <-exitItem.ClickedCh:
+			systray.Quit()
+		}
+	}
 }
 
 func OnExit() {
 	log.Info("Exiting")
-}
-
-func handlePause(item *systray.MenuItem, n *notifier) {
-	for {
-		<-item.ClickedCh
-		if item.Checked() {
-			item.Uncheck()
-			n.resume()
-		} else {
-			item.Check()
-			n.pause()
-		}
-	}
 }
 
 func triggerNotification() {
@@ -55,9 +58,4 @@ func triggerNotification() {
 	if err := notification.Push(); err != nil {
 		log.Error(err)
 	}
-}
-
-func handleExit(item *systray.MenuItem) {
-	<-item.ClickedCh
-	systray.Quit()
 }
