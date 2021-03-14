@@ -29,6 +29,8 @@ func TestNotifier(t *testing.T) {
 		case <-time.After(10 * time.Millisecond):
 			t.Error("expected function to be run")
 		}
+
+		close(functionRan)
 	})
 
 	t.Run("starting notifier logs message", func(t *testing.T) {
@@ -48,6 +50,8 @@ func TestNotifier(t *testing.T) {
 		case <-time.After(10 * time.Millisecond):
 			return
 		}
+
+		close(functionRan)
 	})
 
 	t.Run("pausing notifier logs message", func(t *testing.T) {
@@ -76,6 +80,8 @@ func TestNotifier(t *testing.T) {
 		case <-time.After(10 * time.Millisecond):
 			t.Error("expected resumed function to be run")
 		}
+
+		close(functionRan)
 	})
 
 	t.Run("resuming notifier logs message", func(t *testing.T) {
