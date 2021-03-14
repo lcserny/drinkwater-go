@@ -26,7 +26,7 @@ func OnReady() {
 	n := newNotifier(notificationDelay, triggerNotification)
 	pauseItem := systray.AddMenuItemCheckbox("Pause", "Pause execution", false)
 	exitItem := systray.AddMenuItem("Exit", "Close the system tray app")
-	go n.start()
+	n.start()
 
 	listenForCommands(n, pauseItem, exitItem)
 }

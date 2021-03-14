@@ -5,7 +5,11 @@ import (
 	"time"
 )
 
-// TODO refactor this, make it more testable
+const (
+	startedExecution = "Starting execution"
+	pausedExecution  = "Pausing execution"
+	resumedExecution = "Resuming execution"
+)
 
 func newNotifier(t time.Duration, f func()) *notifier {
 	return &notifier{
@@ -21,23 +25,25 @@ type notifier struct {
 }
 
 func (n *notifier) start() {
-	log.Info("Starting execution")
+	log.Info(startedExecution)
 	n.ticker = time.NewTicker(n.tickerTime)
-	for {
-		<-n.ticker.C
-		n.runFunc()
-	}
+	go func() {
+		for {
+			<-n.ticker.C
+			n.runFunc()
+		}
+	}()
 }
 
 func (n *notifier) pause() {
-	log.Info("Pausing execution")
+	log.Info(pausedExecution)
 	if n.ticker != nil {
 		n.ticker.Stop()
 	}
 }
 
 func (n *notifier) resume() {
-	log.Info("Resuming execution")
+	log.Info(resumedExecution)
 	if n.ticker != nil {
 		n.ticker.Reset(n.tickerTime)
 	}
