@@ -19,6 +19,12 @@ github.com/go-stack/stack
 # github.com/go-toast/toast v0.0.0-20190211030409-01e6764cf0a4
 ## explicit
 github.com/go-toast/toast
+# github.com/lxn/walk v0.0.0-20210112085537-c389da54e794
+## explicit
+github.com/lxn/walk
+# github.com/lxn/win v0.0.0-20210218163916-a377121e959e
+## explicit
+github.com/lxn/win
 # github.com/magefile/mage v1.10.0
 github.com/magefile/mage/mg
 github.com/magefile/mage/sh
@@ -30,7 +36,10 @@ github.com/oxtoacart/bpool
 # github.com/sirupsen/logrus v1.8.0
 ## explicit
 github.com/sirupsen/logrus
-# golang.org/x/sys v0.0.0-20200515095857-1151b9dac4a9
+# golang.org/x/sys v0.0.0-20201018230417-eeed37f84f13
 golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/unix
 golang.org/x/sys/windows
+# gopkg.in/Knetic/govaluate.v3 v3.0.0
+## explicit
+gopkg.in/Knetic/govaluate.v3
