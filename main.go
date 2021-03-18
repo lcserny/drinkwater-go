@@ -26,30 +26,22 @@ func main() {
 	defer f.Close()
 
 	mainWindow := notify.CreateMain("Drink Water Notification")
-
 	tray := notify.CreateTray(mainWindow)
 	defer tray.Dispose()
-
 	if err := notify.AddIconToTray(tray, "glass_original.ico"); err != nil {
 		log.Error(err)
 	}
-
 	if err := tray.SetToolTip("Drink more water notification app"); err != nil {
 		log.Fatal(err)
 	}
-
 	ntf := notify.NewNotifier(notificationDelay, func() { notify.TriggerNotification(tray) })
-
 	if err := notify.AddPauseContextAction(tray, ntf); err != nil {
 		log.Error(err)
 	}
-
 	if err := notify.AddExitContextAction(tray); err != nil {
 		log.Error(err)
 	}
-
 	ntf.Start()
-
 	if err := tray.SetVisible(true); err != nil {
 		log.Fatal(err)
 	}
