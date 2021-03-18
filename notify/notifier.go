@@ -11,7 +11,7 @@ const (
 	resumedExecution = "Resuming execution"
 )
 
-func newNotifier(t time.Duration, f func()) *notifier {
+func NewNotifier(t time.Duration, f func()) *notifier {
 	return &notifier{
 		runFunc:    f,
 		tickerTime: t,
@@ -24,7 +24,7 @@ type notifier struct {
 	ticker     *time.Ticker
 }
 
-func (n *notifier) start() {
+func (n *notifier) Start() {
 	log.Info(startedExecution)
 	n.ticker = time.NewTicker(n.tickerTime)
 	go func() {
@@ -35,14 +35,14 @@ func (n *notifier) start() {
 	}()
 }
 
-func (n *notifier) pause() {
+func (n *notifier) Pause() {
 	log.Info(pausedExecution)
 	if n.ticker != nil {
 		n.ticker.Stop()
 	}
 }
 
-func (n *notifier) resume() {
+func (n *notifier) Resume() {
 	log.Info(resumedExecution)
 	if n.ticker != nil {
 		n.ticker.Reset(n.tickerTime)

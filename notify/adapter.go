@@ -1,61 +1,78 @@
 package notify
 
 import (
-	"github.com/getlantern/systray"
-	"github.com/getlantern/systray/example/icon"
-	"github.com/go-toast/toast"
+	"github.com/lxn/walk"
 	log "github.com/sirupsen/logrus"
-	"time"
 )
 
 const (
-	notificationDelay = 1 * time.Hour
-
-	appId   = "DrinkwaterGo" // when changing this please also update the build script
 	title   = "Drink Water Notification"
 	message = "An hour has passed, you need to drink some water!"
 )
 
-func OnReady() {
-	triggerNotification()
-
-	systray.SetIcon(icon.Data)
-	systray.SetTitle("Drink Water!")
-	systray.SetTooltip("Drink more water notification app")
-
-	n := newNotifier(notificationDelay, triggerNotification)
-	pauseItem := systray.AddMenuItemCheckbox("Pause", "Pause execution", false)
-	exitItem := systray.AddMenuItem("Exit", "Close the system tray app")
-	n.start()
-
-	listenForCommands(n, pauseItem, exitItem)
-}
-
-func listenForCommands(n *notifier, pauseItem *systray.MenuItem, exitItem *systray.MenuItem) {
-	for {
-		select {
-		case <-pauseItem.ClickedCh:
-			if pauseItem.Checked() {
-				pauseItem.Uncheck()
-				n.resume()
-			} else {
-				pauseItem.Check()
-				n.pause()
-			}
-		case <-exitItem.ClickedCh:
-			systray.Quit()
-		}
+func CreateMain(title string) *walk.MainWindow {
+	mw, err := walk.NewMainWindow()
+	if err != nil {
+		log.Fatal(err)
 	}
+	if err := mw.SetTitle(title); err != nil {
+		log.Error(err)
+	}
+	return mw
 }
 
-func OnExit() {
-	log.Info("Exiting")
+func CreateTray(mainWindow *walk.MainWindow) *walk.NotifyIcon {
+	ni, err := walk.NewNotifyIcon(mainWindow)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return ni
 }
 
-func triggerNotification() {
+func AddIconToTray(tray *walk.NotifyIcon, iconPath string) error {
+	iconRes, err := walk.Resources.Icon(iconPath)
+	if err != nil {
+		return err
+	}
+	return tray.SetIcon(iconRes)
+}
+
+func AddPauseContextAction(tray *walk.NotifyIcon, ntf *notifier) error {
+	pauseAction := walk.NewAction()
+	if err := pauseAction.SetText("Pause"); err != nil {
+		return err
+	}
+
+	pauseAction.Triggered().Attach(func() {
+		if pauseAction.Checked() {
+			pauseAction.SetChecked(false)
+			ntf.Resume()
+		} else {
+			pauseAction.SetChecked(true)
+			ntf.Pause()
+		}
+	})
+
+	return tray.ContextMenu().Actions().Add(pauseAction)
+}
+
+func AddExitContextAction(tray *walk.NotifyIcon) error {
+	exitAction := walk.NewAction()
+	if err := exitAction.SetText("Exit"); err != nil {
+		return err
+	}
+
+	exitAction.Triggered().Attach(func() {
+		log.Info("Exiting")
+		walk.App().Exit(0)
+	})
+
+	return tray.ContextMenu().Actions().Add(exitAction)
+}
+
+func TriggerNotification(tray *walk.NotifyIcon) {
 	log.Info("Triggered notification")
-	notification := toast.Notification{AppID: appId, Title: title, Message: message}
-	if err := notification.Push(); err != nil {
+	if err := tray.ShowInfo(title, message); err != nil {
 		log.Error(err)
 	}
 }

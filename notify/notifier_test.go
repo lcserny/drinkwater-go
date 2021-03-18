@@ -12,7 +12,7 @@ func TestNotifier(t *testing.T) {
 	t.Run("notifier can be started to run given function", func(t *testing.T) {
 		functionRan := make(chan struct{})
 
-		notifier := newNotifier(5*time.Millisecond, func() { <-functionRan })
+		notifier := NewNotifier(5*time.Millisecond, func() { <-functionRan })
 
 		select {
 		case <-functionRan:
@@ -21,7 +21,7 @@ func TestNotifier(t *testing.T) {
 			return
 		}
 
-		notifier.start()
+		notifier.Start()
 
 		select {
 		case <-functionRan:
@@ -34,15 +34,15 @@ func TestNotifier(t *testing.T) {
 	})
 
 	t.Run("starting notifier logs message", func(t *testing.T) {
-		assertLogContains(t, newNotifier(1*time.Hour, func() {}).start, startedExecution)
+		assertLogContains(t, NewNotifier(1*time.Hour, func() {}).Start, startedExecution)
 	})
 
 	t.Run("started notifier can be paused", func(t *testing.T) {
 		functionRan := make(chan struct{})
 
-		notifier := newNotifier(5*time.Millisecond, func() { <-functionRan })
-		notifier.start()
-		notifier.pause()
+		notifier := NewNotifier(5*time.Millisecond, func() { <-functionRan })
+		notifier.Start()
+		notifier.Pause()
 
 		select {
 		case <-functionRan:
@@ -55,15 +55,15 @@ func TestNotifier(t *testing.T) {
 	})
 
 	t.Run("pausing notifier logs message", func(t *testing.T) {
-		assertLogContains(t, newNotifier(1*time.Hour, func() {}).pause, pausedExecution)
+		assertLogContains(t, NewNotifier(1*time.Hour, func() {}).Pause, pausedExecution)
 	})
 
 	t.Run("paused notifier can be resumed", func(t *testing.T) {
 		functionRan := make(chan struct{})
 
-		notifier := newNotifier(5*time.Millisecond, func() { <-functionRan })
-		notifier.start()
-		notifier.pause()
+		notifier := NewNotifier(5*time.Millisecond, func() { <-functionRan })
+		notifier.Start()
+		notifier.Pause()
 
 		select {
 		case <-functionRan:
@@ -72,7 +72,7 @@ func TestNotifier(t *testing.T) {
 			return
 		}
 
-		notifier.resume()
+		notifier.Resume()
 
 		select {
 		case <-functionRan:
@@ -85,7 +85,7 @@ func TestNotifier(t *testing.T) {
 	})
 
 	t.Run("resuming notifier logs message", func(t *testing.T) {
-		assertLogContains(t, newNotifier(1*time.Hour, func() {}).resume, resumedExecution)
+		assertLogContains(t, NewNotifier(1*time.Hour, func() {}).Resume, resumedExecution)
 	})
 }
 
